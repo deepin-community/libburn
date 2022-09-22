@@ -1,0 +1,469 @@
+libburn (1.5.4-1) unstable; urgency=low
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Drop unnecessary dependency on dh-autoreconf.
+  * Update standards version to 4.5.0, no changes needed.
+
+  [ Thomas Schmitt ]
+  * Changed Standards-Version to 4.5.1
+    No changes needed according to packaging-manuals/upgrading-checklist.txt
+  * Changed in libburn4.lintian-overrides tag name shlib-calls-exit to
+    exit-in-shared-library
+  * Removed recognition of Debian kfreebsd as system where libcam provides
+    SCSI command passthrough, because libcam vanished from Debian kfreebsd
+  * New upstream version 1.5.4
+    + Bug fix: Early SCSI commands from sg-linux.c were not logged
+    + New API call burn_drive_set_speed_exact()
+    + New API call burn_nominal_slowdown()
+  * update (doc): simplify mentoring instructions
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Tue, 31 Aug 2021 18:51:21 +0200
+
+libburn (1.5.2-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: No lock was obtained for setting up a fifo object
+    + Bug fix: Stream recording was applied regardless whether the drive
+               offers it.
+               This caused Xfburn failures with some MATSHITA laptop drives.
+    + Bug fix: TDK Corporation was not recognized as manufacturer of
+               DVD-R "TTH02"
+    + Made libburn ready for building out-of-source. Thanks Ross Burton.
+    + New API calls burn_drive_get_feature_codes(), burn_drive_get_feature()
+    + New cdrskin option --list_features
+  * Patch taken from upstream development
+    + cdrskin multi-track burning was slow and stalled after track 1.
+      Regression introduced in version 1.5.0 by commit 84fad99, 2018.02.05,
+      which should fix a bug with O_DIRECT track reading.
+      For now, O_DIRECT is forcefully disabled in libburn and 84fad99 is
+      effectively reverted in cdrskin. Debian never enabled O_DIRECT, so
+      84fad99 was never desirable.
+  * Changed Build-Depends: "debhelper (>= 9)" to "debhelper-compat (= 12)" and
+    removed debian/compat by cme "fix" "dpkg".
+  * Changed Standards-Version to 4.4.1
+    No changes needed according to packaging-manuals/upgrading-checklist.txt
+  * Removed AUTHORS README NEWS from libburn-doc.docs because already in -dev.
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Sun, 01 Dec 2019 18:11:05 +0100
+
+libburn (1.5.0-1) unstable; urgency=low
+
+  [ Thomas Schmitt ]
+  * New upstream release
+    + Bug fix: cdrskin threw errno 22 on data file input if libburn is
+               configured with --enable-track-src-odirect
+    + Bug fix: SIGSEGV could happen if a track ended by reaching its fixed size
+               while the track source still was willing to deliver bytes.
+               Thanks to user swordragon.
+    + Bug fix: Device file comparison parameters were recorded wrong with
+               Linux sg
+  * Removed ${shlibs:Depends} from packages -dev, -dbg, and -doc.
+    + "cme modify dpkg-control" additionally re-arranged some definitions.
+  * Removed explicit -dbg package definition from control and rules.
+  * Updated package descriptions.
+    + libburn synopsis now mentions BD.
+    + cdrskin description now has less low-level technical details.
+  * Changed Standards-Version to 4.2.1
+    No changes needed according to packaging-manuals/upgrading-checklist.txt
+  * Corrected a false statement in Description.
+    + libburn does not master, but only read and write.
+  * Replaced in control file alioth repo URL by salsa repo URL:
+    + Vcs-Git: https://salsa.debian.org/optical-media-team/libburn.git
+
+  [ Dominique Dumont ]
+  * add debian/gbp.conf
+  * add README.source
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Fri, 05 Oct 2018 21:21:10 +0200
+
+libburn (1.4.8-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: Option -dummy did not affect writing by direct_write_amount=
+    + New API call burn_drive_reset_simulate()
+    + New API call burn_drive_get_bd_r_pow()
+    + Refusing to write to BD-R if formatted to Pseudo Overwrite
+  * Changed Standards-Version to 4.1.0
+    + Removed "Priority: extra" from Package: libburn-dbg
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Sat, 16 Sep 2017 10:59:03 +0200
+
+libburn (1.4.6-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: SAO CD could be perceived 2 blocks to short.
+               Regression in 1.4.4 by rev 5672.
+    + New API call burn_drive_set_immed()
+    + New cdrskin option use_immed_bit=
+  * Changed Vcs-Browser URI in debian/control to https
+  * Adapted Priority of libburn-dev and libburn-doc to FTP Master overrides
+  * Marked libburn-doc as Multi-Arch: foreign
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Sat, 17 Sep 2016 18:23:25 +0200
+
+libburn (1.4.4-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: Option drive_scsi_dev_family=sg did not convert /dev/sr* to
+              /dev/sg*
+    + Bug fix: burn_make_input_sheet_v07t() falsly recognized double byte
+               encoding. Affected cdrskin option: cdtext_to_v07t=
+    + Bug fix: Double free at end of run if burn_write_opts_set_leadin_text() is
+               used. Affected cdrskin option: textfile=
+    + Bug fix: DVD book type of DVD+RW DL and DVD+R DL was reported wrong.
+               Thanks to Etienne Bergeron.
+  * Changed Standards-Version to 3.9.8
+    No changes needed according to packaging-manuals/upgrading-checklist.txt
+  * Applied cme "fix" "dpkg" to change debian/copyright header "Format:"
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Sun, 10 Jul 2016 08:36:18 +0200
+
+libburn (1.4.2.pl01-2) unstable; urgency=low
+
+  * Changed Standards-Version to 3.9.7
+    No changes needed according to packaging-manuals/upgrading-checklist.txt
+  * Reacted on lintian hardening warnings by debian/rules variable
+    DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Fri, 5 Feb 2016 18:57:35 +0200
+
+libburn (1.4.2.pl01-1) unstable; urgency=low
+
+  * New upstream bugfix release
+    + Bug fix: cdrskin failed with "failed to attach fifo" when burning
+               from stdin. Regression of 1.4.2, rev 5522.
+  * Multiarchify the library packages. (Closes: #813020)
+    by Matthias Klose <doko@ubuntu.com>
+  * Removed uversionmangle rule from debian/watch.
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Sat, 30 Jan 2016 20:58:29 +0200
+
+libburn (1.4.2-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: burn_disc_get_media_id() returned BD identifiers 2 chars
+               too long
+    + Bug fix: burn_disc_get_multi_caps() returned 2048 bytes too many in
+               caps.start_range_high
+    + Bug fix: Media summary session count of blank and closed media was
+               short by 1
+    + Bug fix: Endless loop if transport error occurs while waiting for
+               drive ready
+    + New API calls burn_drive_get_serial_no() and burn_drive_get_media_sno()
+    + Result of a Coverity audit: 40+ code changes, but no easy-to-trigger bugs
+  * Removed patch 01-recognize-kfreebsd-for-libcam.patch
+  * Removed "cdck" from Suggests because not available on kfreebsd
+  * Changed Priority of libburn-dev and libburn-doc to "extra"
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Sun, 29 Nov 2015 16:59:52 +0200
+
+libburn (1.4.0-3) unstable; urgency=low
+
+  * Fixed failure to recognize the need for libcam on Debian GNU/kFreeBSD
+  * lintian:
+    + Silenced complaint extended-description-is-probably-too-short
+    + Added override for shlib-calls-exit (use of exit() is controlled by API)
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Fri, 18 Sep 2015 13:59:50 +0200
+
+libburn (1.4.0-2) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: Drive error reports were ignored during blanking and formatting.
+    + Bug fix: A failed MMC BLANK command did not cause error indication
+               by libburn.
+    + Bug fix: A final fsync(2) was performed with stdio drives, even if not
+               desired
+    + Bug fix: CD TAO with multiple tracks could cause a buffer overrun.
+    + Bug fix: Wrong stack usage caused SIGBUS on sparc when compiled
+               by gcc -O2. (Closes: #746254)
+    + Bug fix: Minimum drive buffer fill was measured by cdrskin before the
+               buffer could get full.
+    + Bug fix: Double free with cdrskin -vvv.
+               Introduced with rev 5065, version 1.3.1.
+    + Bug fix: Wrong read access to memory. Reported by valgrind.
+  * Closing older fixed bugs: libburn-1.2.4 (Closes: #690207)
+  * Closing reports about drive or media problems:
+     (Closes: #702621) (Closes: #789260)
+  * Removed dependency on doxygen
+  * Corrected license of upstream to GPL-2+ (from GPL-2)
+  * Migrated to debhelper 9 and applied changes proposed by cme.
+  * Added myself to Uploaders after becoming co-admin of the maintainer project
+
+ -- Thomas Schmitt <scdbackup@gmx.net>  Wed, 09 Sep 2015 15:15:06 +0200
+
+libburn (1.3.2-1.1) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * Non-maintainer upload.
+  * Use dh-autoreconf to regenerate configure script (Closes: #753421).
+  * Build-depends on pkg-config to get PKG_CHECK_MODULES definition.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 30 Aug 2014 01:42:41 +0200
+
+libburn (1.3.2-1) unstable; urgency=low
+
+  * New upstream release (Closes: #718151)
+  * Drop patches applied upstream
+
+ -- George Danchev <danchev@spnet.net>  Sun, 08 Sep 2013 14:46:12 +0200
+
+libburn (1.2.2-2) unstable; urgency=low
+
+  * Bugfix patch (Closes: #680910)
+    01_sao-tracks-started-by-audio-pause:
+    CD SAO sessions with data tracks was started by an audio pause.
+    Affected is an old Sony CD burner, refusing to burn SAO.
+  * Bugfix patch (Closes: #680911)
+    02_sao-2-sectors-short-fix:
+    CD tracks are perceived 2 sectors too short.
+    A correclty burnt CD media in SAO mode, will not be recognized
+    as correct burn by xorriso inspection, which believes that the
+    track size is two sectors shorter, where it is not.
+  * Bugfix patch (Closes: #680968)
+    03_cdrskin-sigsegv-track-source-added-no-drive-available
+    cdrskin could SIGSEGV if track source was added when no drive
+    was available.
+
+ -- George Danchev <danchev@spnet.net>  Mon, 09 Jul 2012 10:47:15 +0200
+
+libburn (1.2.2-1) unstable; urgency=low
+
+  * New upstream release
+    (libburn: small internal refinements)
+  * Remove Mats Erik Andersson from Uploaders as he requested.
+  * Use the new URL in copyright Format field.
+
+ -- George Danchev <danchev@spnet.net>  Tue, 03 Apr 2012 16:21:13 +0300
+
+libburn (1.2.0-1) unstable; urgency=low
+
+  * New upstream release
+    libburn is now able to read and write CD-TEXT with CD SAO audio
+    sessions. It can now read CDRWIN .cue files which define pure
+    audio or pure data sessions.
+  * Drop Section: libs for libburn4 package, inherited by Source.
+  * Convert debian/copyright to DEP5 format.
+
+ -- George Danchev <danchev@spnet.net>  Wed, 01 Feb 2012 11:50:07 +0000
+
+libburn (1.1.8-1) unstable; urgency=low
+
+  * New upstream release
+    + bugfix: Misinterpreted mode page 2A if block descriptors are present
+    + Enabled recognition of QEMU DVD-ROM 0.12
+    + New API call burn_drive_re_assess()
+    + cdrskin: avoid to intermediately close and open drive device file
+
+ -- George Danchev <danchev@spnet.net>  Mon, 21 Nov 2011 13:44:13 +0200
+
+libburn (1.1.6-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: stdio sizes > 4 TB - 32 kB caused integer rollover
+    + Worked around a collision with Linux udev which lets links vanish
+
+ -- George Danchev <danchev@spnet.net>  Thu, 29 Sep 2011 15:47:20 +0300
+
+libburn (1.1.4-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: Some drives return -150 as NWA of blank CD, rather than 0.
+      libburn forwarded this misleading information to the application.
+    + Bug fix: Some drives returned wrong CD sizes after having burned DVD-R
+    + Bug fix: Empty ROM drive was mistaken to hold an unsuitable disc
+    + Bug fix: Avoiding to load speed descriptor list twice
+    + New API call burn_lookup_device_link()
+    + New API call burn_disc_get_phys_format_info()
+    + New cdrskin option --device_links
+  * Build depend on kfreebsd-any instead of kfreebsd-$arch.
+
+ -- George Danchev <danchev@spnet.net>  Sun, 14 Aug 2011 13:38:56 +0300
+
+libburn (1.1.0.pl01-1) unstable; urgency=low
+
+  * New upstream release (fixes FTBFS on hurd-i386:
+    previous version compiles on Linux, (k)FreeBSD and
+    Solaris only, fails on other OSes, including the Hurd,
+    which more or less affect Debian, hence the upload)
+
+ -- George Danchev <danchev@spnet.net>  Mon, 20 Jun 2011 21:08:20 +0300
+
+libburn (1.1.0-1) unstable; urgency=low
+
+  * New upstream release
+    + Bug fix: burn_disc_format() on DVD-RW issued
+      wrong block size with type 00h
+    + New API call burn_disc_next_track_is_damaged()
+    + New API call burn_disc_close_damaged()
+    + Dropped suffix .plXY from tarball name
+    + Release 1.0.8 was skipped to get back in
+      sync with libisofs and libisoburn.
+
+ -- George Danchev <danchev@spnet.net>  Sun, 19 Jun 2011 16:57:17 +0300
+
+libburn (1.0.6.pl00-2) unstable; urgency=low
+
+  * [GD] Drop cdbs, switch to dh
+       + use libburn-doc.docs rather than libburn-doc.install.
+       + filter -doc around dh_listpackages (dpkg-buildpackage -B).
+       + compat 8, require debhelper >= 8.
+       + add AUTHORS, README, NEWS to libburn-dev.docs, cdrskin.docs,
+       + libburn4.docs, libburn-dbg.docs, libburn-doc.docs.
+  * [GD] Drop graphviz from build-depends, not used anymore.
+  * [GD] Move doxygen to Build-Depends-Indep.
+  * [GD] Add Mats Erik Andersson to Uploaders.
+  * [GD] Fix spelling error in cdrskin package description.
+  * [GD] cdrskin description mentions xorriso (as burner+imager).
+  * [GD] cdrskin Suggests xorriso and cdck.
+  * [GD] Standards-Version: 3.9.2 (no changes needed).
+  * [GD] Install doc/* via libburn-doc.docs.
+  * [GD] Install test/*.c via libburn-doc.examples.
+  * [GD] Update libburn4 description, thanks Thomas Schmitt.
+
+ -- George Danchev <danchev@spnet.net>  Tue, 14 Jun 2011 08:33:35 +0300
+
+libburn (1.0.6.pl00-1) unstable; urgency=low
+
+  * New upstream release.
+  * Standards-Version 3.9.1 (no changes needed).
+  * Install doc/comments too with the libburn-doc binary
+    package, as it contains useful information.
+  * Drop Simon Huggins from uploaders as he requested.
+    Thank you for your work.
+
+ -- George Danchev <danchev@spnet.net>  Sat, 09 Apr 2011 10:15:57 +0300
+
+libburn (1.0.4.pl00-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- George Danchev <danchev@spnet.net>  Sun, 13 Mar 2011 15:29:10 +0000
+
+libburn (0.8.0.pl00-2) unstable; urgency=low
+
+  * Do not install gifs in the doc package, since newer doxygen
+    does not generate tab*.gif anymore. Closes: #590419
+
+ -- George Danchev <danchev@spnet.net>  Mon, 26 Jul 2010 20:55:04 +0300
+
+libburn (0.8.0.pl00-1) unstable; urgency=low
+
+  * New upstream release.
+  * Added debian/source/format
+  * Standards-Version 3.8.4 (no changes needed)
+
+ -- George Danchev <danchev@spnet.net>  Tue, 04 May 2010 18:23:56 +0300
+
+libburn (0.7.6.pl00-2) unstable; urgency=low
+
+  * Added architecture specific symbol:
+  (arch=kfreebsd-i386 kfreebsd-amd64)sg_close_drive@Base 0.7.6.pl00
+
+ -- George Danchev <danchev@spnet.net>  Sun, 24 Jan 2010 10:42:09 +0200
+
+libburn (0.7.6.pl00-1) unstable; urgency=low
+
+  * New upstream release
+     bugfixes and improvements to kfreebsd adapter
+     experimental SCSI transport adapter via libcdio
+  * New symbols added to libburn4.symbols
+  * Build depend on libcam-dev [kfreebsd-i386 kfreebsd-amd64]
+
+ -- George Danchev <danchev@spnet.net>  Sun, 24 Jan 2010 08:14:30 +0200
+
+libburn (0.7.4.pl01-1) unstable; urgency=low
+
+  * New upstream release (support for kfreebsd ports)
+
+ -- George Danchev <danchev@spnet.net>  Sat, 26 Dec 2009 18:37:03 +0200
+
+libburn (0.7.4-1) unstable; urgency=low
+
+  * New upstream release (mostly bugfixes and new API calls)
+  * Install cdrskin/cdrskin.1 instead of outdated
+    debian/cdrskin.1 which is now removed.
+  * Added new symbols, remove trailing debian revision.
+
+ -- George Danchev <danchev@spnet.net>  Fri, 25 Dec 2009 20:36:57 +0200
+
+libburn (0.7.0-1) unstable; urgency=low
+
+  * New Upstream Release
+
+ -- Simon Huggins <huggie@earth.li>  Sun, 04 Oct 2009 16:48:06 +0100
+
+libburn (0.6.4-1) unstable; urgency=low
+
+  [ George Danchev ]
+  * added libburn4.symbols -- common symbols file.
+  * added versioned build dependency for debhelper to please lintian.
+
+  [ Simon Huggins ]
+  * New Upstream Release
+  * Improve symbols file using version in stable as base.
+
+ -- George Danchev <danchev@spnet.net>  Mon, 16 Mar 2009 10:46:21 +0000
+
+libburn (0.6.2-2) unstable; urgency=low
+
+  [ Simon Huggins ]
+  * Include the test programs in the -doc package to give people a better idea
+    of how to use it
+
+ -- Debian Libburnia packagers <pkg-libburnia-devel@lists.alioth.debian.org>  Sat, 28 Feb 2009 18:47:01 +0000
+
+libburn (0.6.2-1) unstable; urgency=low
+
+  [ Simon Huggins ]
+  * New upstream release.
+
+  [ Matthew Rosewarne ]
+  * Added Vcs-Svn and Vcs-Browser fields.
+
+ -- Debian Libburnia packagers <pkg-libburnia-devel@lists.alioth.debian.org>  Sat, 28 Feb 2009 12:26:48 +0000
+
+libburn (0.5.0-1) unstable; urgency=low
+
+  * New upstream release.
+    - Now officially supports BD-RE.
+
+  [ Matthew Rosewarne ]
+  * Bumped Debhelper compat to 6.
+  * Bumped Standards-Version to 3.8.0.
+  * Updated watch file for new upstream versioning scheme.
+  * Added -dbg package.
+
+ -- Debian Libburnia packagers <pkg-libburnia-devel@lists.alioth.debian.org>  Sun, 10 Aug 2008 16:20:31 +0100
+
+libburn (0.4.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- George Danchev <danchev@spnet.net>  Sat, 12 Apr 2008 21:35:26 +0200
+
+libburn (0.4.2-2) unstable; urgency=low
+
+  [ Mario Danic ]
+  * Update upstream URLs and copyright details
+
+  [ Simon Huggins ]
+  * Update uploaders and set the maintainer to the list
+
+  [ Matthew Rosewarne ]
+  * Rename libburn4-doc to libburn-doc.
+  * Tidy up packaging.
+  * Add watch file.
+
+ -- Debian Libburnia packagers <pkg-libburnia-devel@lists.alioth.debian.org>  Thu, 28 Feb 2008 10:20:38 +0000
+
+libburn (0.4.2-1) unstable; urgency=low
+
+  * Initial release in this form
+   - replaces old cdrskin with static lib
+   - updates libburn to a recent version      closes: #383579, #428438, #426016
+   - improved the description (more work needed?)               closes: #455605
+   - Use newer upstream which builds cdrskin dynamically linked to libburn.
+
+ -- Simon Huggins <huggie@earth.li>  Fri, 01 Feb 2008 12:43:21 +0000

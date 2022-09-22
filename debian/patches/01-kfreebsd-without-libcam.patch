@@ -1,0 +1,48 @@
+Description: Remove the need for libcam in Debian kfreebsd
+  libcam-dev from freebsd-libs is not available any more. But the upstream
+  ./configure expects it to exist if target matches *-kfreebsd*-gnu*.
+  This patch removes kfreebsd from the list of kernels where libburn
+  can burn optical media. libburn will then only provide stdio capabilities,
+  which suffice to create ISO 9660 image files by xorriso.
+Forwarded: Upstream is aware and plans to develop conditional use of libcam
+Author: Thomas Schmitt <scdbackup@gmx.net>
+  
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -29,10 +29,6 @@
+       LIBBURN_ARCH_LIBS=-lcam
+       LIBBURNIA_PKGCONFDIR=$(echo "$libdir" | sed 's/\/lib$/\/libdata/')/pkgconfig
+       ;;
+-    *-kfreebsd*-gnu*)
+-      ARCH=freebsd
+-      LIBBURN_ARCH_LIBS=-lcam
+-      ;;
+     *-solaris*)
+       ARCH=solaris
+       LIBBURN_ARCH_LIBS=-lvolmgt
+--- a/libburn/sg.c
++++ b/libburn/sg.c
+@@ -40,15 +40,6 @@
+ #endif
+ 
+ #else
+-#ifdef __FreeBSD_kernel__
+-
+-#ifdef Libburn_use_sg_freebsd_porT
+-#include "sg-freebsd-port.c"
+-#else
+-#include "sg-freebsd.c"
+-#endif
+-
+-#else
+ #ifdef __linux
+ 
+ #include "sg-linux.c"
+@@ -84,7 +75,6 @@
+ 
+ #endif /* ! __sun */
+ #endif /* ! __linux */
+-#endif /* ! __FreeBSD_kernel__ */
+ #endif /* ! __FreeBSD__ */
+ #endif /* ! __OpenBSD__ */
+ #endif /* ! __NetBSD__ */

@@ -1,0 +1,63 @@
+Source: libburn
+Maintainer: Debian Libburnia packagers <pkg-libburnia-devel@lists.alioth.debian.org>
+Uploaders: George Danchev <danchev@spnet.net>,
+           Mario Danic <mario.danic@gmail.com>,
+           Thomas Schmitt <scdbackup@gmx.net>
+Section: libs
+Priority: optional
+Build-Depends: pkg-config,
+               debhelper-compat (= 12)
+Standards-Version: 4.5.1
+Vcs-Browser: https://salsa.debian.org/optical-media-team/libburn
+Vcs-Git: https://salsa.debian.org/optical-media-team/libburn.git
+Homepage: http://libburnia-project.org
+
+Package: libburn4
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Pre-Depends: ${misc:Pre-Depends}
+Description: library to provide CD/DVD/BD writing functions
+ libburn is a library for reading and writing optical discs.
+ Supported media are: CD-R, CD-RW, DVD-RAM, DVD+RW, DVD+R, DVD+R/DL,
+ DVD-RW, DVD-R, DVD-R/DL, BD-R, BD-RE.
+
+Package: cdrskin
+Architecture: any
+Section: otherosfs
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Suggests: xorriso
+Description: command line CD/DVD/BD writing tool
+ cdrskin strives to be a second source for the services traditionally
+ provided by cdrecord. It writes data sessions to CD, DVD, or BD media.
+ To CD media it may also write audio sessions.
+ Multi-session is possible on all media types except DVD-R DL and
+ fastly blanked DVD-RW.
+ .
+ This is a burner-only application. If you want a burner and ISO 9660 image
+ manipulation application, please install the xorriso package.
+
+Package: libburn-dev
+Architecture: any
+Multi-Arch: same
+Section: libdevel
+Depends: ${misc:Depends},
+         libburn4 (= ${binary:Version})
+Suggests: libburn-doc (= ${source:Version})
+Description: development package for libburn4
+ This package contains the headers, pkgconfig data and static library for
+ libburn.
+ You need the headers if you want to develop or compile applications which
+ make use of the libburn4 API. Its definition is in <libburn/libburn.h>.
+
+Package: libburn-doc
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Depends: ${misc:Depends}
+Description: background documentation for libburn library
+ This package contains the background documentation for libburn. Not needed
+ for application development but rather describing the peculiarities of
+ optical media.
