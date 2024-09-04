@@ -1,3 +1,9 @@
+libburn (1.5.4-1-1deepin1) unstable; urgency=low
+
+  * feat: usec: merge uts01 cd burn control.
+
+ -- zhangya <zhangya@uniontech>  Wed, 04 Sep 2024 14:54:21 +0200
+
 libburn (1.5.4-1) unstable; urgency=low
 
   [ Debian Janitor ]
