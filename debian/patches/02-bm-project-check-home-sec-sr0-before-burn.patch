@@ -1,0 +1,144 @@
+Description: feature: bm project, check /home/.sec/sr0 permission when burn.
+Author: zhangya <zhangya@uniontech.com>
+Date: Wed, 28 Sep 2022 04:17:00 +0800
+Index: libburn/libburn/async.c
+===================================================================
+--- libburn.orig/libburn/async.c
++++ libburn/libburn/async.c
+@@ -44,6 +44,8 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <signal.h>
++#include <fcntl.h>
++#include <errno.h>
+ 
+ /*
+ #include <a ssert.h>
+@@ -387,6 +389,8 @@ static void *erase_worker_func(struct w_
+ 	return NULL;
+ }
+ 
++extern int cdrom_has_perm(const char* devname, int flag);
++
+ void burn_disc_erase(struct burn_drive *drive, int fast)
+ {
+ 	union w_list_data o;
+@@ -412,6 +416,17 @@ void burn_disc_erase(struct burn_drive *
+ 		return;
+ 	}
+ 
++    if( drive && drive->devname){
++        int perm = cdrom_has_perm(drive->devname, O_RDWR);
++        if (perm != 0){
++            libdax_msgs_submit(libdax_messenger, -1,
++			0x0003ff7e,
++			LIBDAX_MSGS_SEV_FATAL, LIBDAX_MSGS_PRIO_HIGH,
++			"DRIVE: No permisson erase", EACCES, 0);
++		return;
++        }
++    }
++
+ 	reset_progress(drive, 1, 1, 1, 0x10000, 0);
+ 
+ 	/* A70103 : will be set to 0 by burn_disc_erase_sync() */
+Index: libburn/libburn/drive.c
+===================================================================
+--- libburn.orig/libburn/drive.c
++++ libburn/libburn/drive.c
+@@ -1132,8 +1132,16 @@ enum burn_disc_status burn_disc_get_stat
+ 	return d->status;
+ }
+ 
++extern int cdrom_has_perm(const char* devname, int flag);
++
+ int burn_disc_erasable(struct burn_drive *d)
+ {
++    if( d && d->devname){
++        int perm = cdrom_has_perm(d->devname, O_RDWR);
++        if (perm != 0){
++            return 0;
++        }
++    }
+ 	return d->erasable;
+ }
+ enum burn_drive_status burn_drive_get_status(struct burn_drive *d,
+Index: libburn/libburn/write.c
+===================================================================
+--- libburn.orig/libburn/write.c
++++ libburn/libburn/write.c
+@@ -1415,6 +1415,38 @@ static int precheck_disc_has_cdtext(stru
+ 	return 0;
+ }
+ 
++int check_deepin_sec_cdrom_perm(const char* path_format, const char* name, int flag)
++{
++	#define CDROM_MAX_LEN 8
++	int fd = 0;
++	char acfileName[CDROM_MAX_LEN + 24];
++	// control access device by sid2
++	snprintf(acfileName, sizeof(acfileName), path_format, name);
++	fd = open(acfileName, flag, S_IRUSR);
++
++	if (fd < 0 && errno == EACCES) {
++		return -EACCES;
++	}
++
++	else if (fd > 0) {
++		close(fd);//need to close file
++	}
++
++	return 0;
++}
++
++int cdrom_has_perm(const char* devname, int flag)
++{
++	if (strlen(devname) < (1+strlen("/dev/"))) {
++		return 0;
++	}
++
++	int perm = check_deepin_sec_cdrom_perm("/var/lib/deepin/.sec/%s", devname + strlen("/dev/"),  flag);
++	if(perm == 0)
++		perm = check_deepin_sec_cdrom_perm("/home/.sec/%s", devname + strlen("/dev/"),  flag);
++
++	return perm;
++}
+ 
+ /* ts A70219 : API */
+ int burn_precheck_write(struct burn_write_opts *o, struct burn_disc *disc,
+@@ -1424,10 +1456,21 @@ int burn_precheck_write(struct burn_writ
+ 	struct burn_drive *d = o->drive;
+ 	char *msg = NULL, *reason_pt;
+ 	int no_media = 0, ret, has_cdtext, is_bd_pow = 0;
++    int no_permission = 0;
+ 
+ 	reason_pt= reasons;
+ 	reasons[0] = 0;
+ 
++    if( o && o->drive && o->drive->devname){
++        int perm = cdrom_has_perm(o->drive->devname, O_RDWR);
++        if (perm != 0){
++            sprintf(reasons,
++			       "DRIVE: No permisson write");
++            no_permission = 1;
++		    goto ex;
++        }
++    }
++
+ 	if (d->drive_role == 0 || d->drive_role == 4) {
+ 		if (d->drive_role == 0)
+ 			sprintf(reasons,
+@@ -1542,6 +1585,14 @@ ex:;
+ 				  "No suitable media detected", 0, 0);
+ 			return -1;
+ 		}
++        if (no_permission) {
++			if (!silent)
++				libdax_msgs_submit(libdax_messenger,
++				  d->global_index, 0x0003ff7e,
++				  LIBDAX_MSGS_SEV_FATAL, LIBDAX_MSGS_PRIO_HIGH,
++				  "DRIVE: No permisson write", EACCES, 0);
++			return -1;
++		}
+ 		if (!silent)
+ 			libdax_msgs_submit(libdax_messenger,
+ 				  d->global_index, 0x00020139,
