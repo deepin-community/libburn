@@ -1,3 +1,9 @@
+libburn (1.5.4-1-1deepin2) unstable; urgency=medium
+
+  * Rebuild with LTO enabled (dpkg vendor feature optimize/lto).
+
+ -- tunaichao <tunaichao@uniontech.com>  Fri, 11 Sep 2026 16:16:13 +0800
+
 libburn (1.5.4-1-1deepin1) unstable; urgency=low
 
   * feat: usec: merge uts01 cd burn control.
